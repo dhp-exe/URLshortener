@@ -46,7 +46,6 @@ router.post("/", async(req,res) => {
             SELECT short_code
             FROM urls
             WHERE long_url = $1
-            AND (expires_at IS NULL OR expires_at > NOW())
             `,
             [url]
         );
@@ -92,7 +91,34 @@ router.post("/", async(req,res) => {
 
 // GET /:shortcode
 router.get("/:shortCode", async(req,res) => {
-    
+    try{
+        const {shortCode} = req.params;
+        if(!shortCode){
+            return res.status(400).json({error: "Short code is required"});
+        }
+        const cached = await redis.get(`short:${shortCode}`);
+        if(cached){
+            return res.redirect(cached);
+        }
+        const result = await pool.query(
+            `
+            SELECT long_url
+            FROM urls
+            WHERE short_code = $1
+            `,
+            [shortCode]
+        );
+        if(result.rows.length === 0){
+            return res.status(404).json({error: "Short code not found"});
+        }
+        const longUrl = result.rows[0].long_url;
+        await redis.set(`short:${shortCode}`, longUrl);
+        await redis.set(`longurl:${longUrl}`, shortCode);
+        return res.redirect(301, longUrl);
+    }
+    catch(error){
+        res.status(500).json({error: "Server error"});
+    }
 })
 
 // PUT /api/
