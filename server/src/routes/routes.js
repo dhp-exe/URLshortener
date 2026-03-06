@@ -1,25 +1,27 @@
 import express from "express"
 import validator from "validator"
-import redis from "../db/redis";
-import pool from "../db/postgres";
+import redis from "../db/redis.js";
+import pool from "../db/postgres.js";
 
 const router = express.Router();
+const BASE_URL = "http://localhost:5001";
 
 function encodeBase62(num) {
     const BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    
     let result = "";
-
     while (num > 0) {
         result = BASE62[num % 62] + result;
         num = Math.floor(num / 62);
     }
-
     return result;
 }
 
+router.get("/", (req, res) => {
+    res.json({ message: "URL Shortener API is active" });
+});
+
 // POST /api/shorten
-router.post("/", async(req,res) => {
+router.post("/api/shorten", async(req,res) => {
     try{
         let {url} = req.body;
 
@@ -30,13 +32,14 @@ router.post("/", async(req,res) => {
         })){
             return res.status(400).json({error: "Url is required"});
         }
-        url = validator.normalizeURL(url)
+        url = url.trim().replace(/\/+$/, "");
 
         //check Redis cache
         const cached = await redis.get(`longurl:${url}`);
         if(cached){
+            console.log("Cache hit for URL:", url);
             return res.status(200).json({
-                shortURL: `http://localhost:5000/${cached}`
+                shortURL: `${BASE_URL}/${cached}`
             });
         }
 
@@ -53,38 +56,28 @@ router.post("/", async(req,res) => {
             const shortCode = result.rows[0].short_code;
 
             return res.status(200).json({
-                shortURL: `http://localhost:5000/${shortCode}`
+                shortURL: `${BASE_URL}/${shortCode}`
             });
         }
-        await redis.set(`longurl:${url}`, shortCode);
-        await redis.set(`short:${shortCode}`, url);
 
         // insert and generate shortcode
-        const insertResult = await pool.query(
-            `
-            INSERT INTO urls (long_url)
-            VALUES ($1)
-            RETURNING id
-            `,
-            [url]
-        );
-        const id = insertResult.rows[0].id;
-        const shortCode = encodeBase62(id);
+        const idResult = await pool.query("SELECT nextval('urls_id_seq')");
+        const newId = parseInt(idResult.rows[0].nextval);
+        const shortCode = encodeBase62(newId);
+
         await pool.query(
-            `
-            UPDATE urls
-            SET short_code = $1
-            WHERE id = $2
-            `,
-            [shortCode, id]
+            "INSERT INTO urls (id, long_url, short_code) VALUES ($1, $2, $3)",
+            [newId, url, shortCode]
         );
+
         await redis.set(`longurl:${url}`, shortCode);
         await redis.set(`short:${shortCode}`, url);
         return res.status(201).json({
-            shortURL: `http://localhost:5000/${shortCode}`
+            shortURL: `${BASE_URL}/${shortCode}`
         });
     }
     catch(error){
+        console.error("DEBUG ERROR:", error);
         res.status(500).json({error: "Server error"});
     }
 })
@@ -117,8 +110,11 @@ router.get("/:shortCode", async(req,res) => {
         return res.redirect(301, longUrl);
     }
     catch(error){
+        console.error("DEBUG ERROR:", error);
         res.status(500).json({error: "Server error"});
     }
 })
 
 // PUT /api/
+
+export default router;

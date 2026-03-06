@@ -8,6 +8,10 @@ redis.on("error", (err) => {
     console.error("Redis error:", err);
 });
 
-await redis.connect();
+try {
+    await redis.connect();
+} catch (err) {
+    console.error("Critical: Could not connect to Redis", err);
+}
 
 export default redis;
