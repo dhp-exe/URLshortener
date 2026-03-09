@@ -1,6 +1,104 @@
+/* Popup Modal Styles */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-modal {
+  background: #181818;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+  padding: 2.2rem 2.2rem 1.5rem 2.2rem;
+  min-width: 320px;
+  max-width: 90vw;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.popup-close {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.7rem;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 10;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.popup-close:hover {
+  color: #ff6666;
+}
+
+.popup-title {
+  font-size: 1.2rem;
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 1.1rem;
+  margin-left: 2.2rem;
+}
+
+.popup-url-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.popup-short-url {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  font-size: 1.08em;
+  word-break: break-all;
+  margin-right: 0.2em;
+}
+
+.popup-copy-btn {
+  padding: 0.5em 1.1em;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(90deg, #fff 60%, #bbb 100%);
+  color: #222;
+  font-size: 1em;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.popup-copy-btn:hover, .popup-copy-btn:focus {
+  background: linear-gradient(90deg, #eee 60%, #aaa 100%);
+  color: #000;
+  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.12);
+}
+
+.popup-copied {
+  color: #7fff7f;
+  font-size: 0.98em;
+  margin-left: 0.3em;
+  font-weight: 500;
+  transition: color 0.2s;
+}
 
 /* Luxurious minimalist styling */
-.lux-bg {
+.bg {
   min-height: 100vh;
   width: 100vw;
   background: linear-gradient(135deg, #222 60%, #444 100%);
@@ -12,7 +110,7 @@
 }
 
 /* Subtle geometric overlays */
-.lux-bg::before {
+.bg::before {
   content: '';
   position: absolute;
   top: -20%;
@@ -23,7 +121,7 @@
   z-index: 0;
 }
 
-.lux-container {
+.container {
   background: rgba(30,30,30,0.85);
   border-radius: 32px;
   box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
@@ -36,11 +134,11 @@
   align-items: center;
 }
 
-.lux-header {
+.header {
   text-align: center;
   margin-bottom: 2rem;
 }
-.lux-title {
+.title {
   font-family: 'SF Pro Display', 'Avenir', 'Helvetica Neue', Arial, sans-serif;
   font-size: 2.8rem;
   font-weight: 700;
@@ -48,7 +146,7 @@
   letter-spacing: 0.04em;
   margin-bottom: 0.5rem;
 }
-.lux-credit {
+.credit {
   font-family: 'Avenir', 'Helvetica Neue', Arial, sans-serif;
   font-size: 1rem;
   color: #bbb;
@@ -56,20 +154,20 @@
   letter-spacing: 0.08em;
 }
 
-.lux-main {
+.main {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.lux-form {
+.form {
   display: flex;
   width: 100%;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
 }
-.lux-input {
+.input {
   flex: 1;
   padding: 0.9em 1.2em;
   border-radius: 16px;
@@ -82,11 +180,11 @@
   outline: none;
   transition: background 0.2s, box-shadow 0.2s;
 }
-.lux-input:focus {
+.input:focus {
   background: #333;
   box-shadow: 0 4px 16px 0 rgba(0,0,0,0.12);
 }
-.lux-btn {
+.btn {
   padding: 0.9em 1.6em;
   border-radius: 16px;
   border: none;
@@ -99,13 +197,13 @@
   box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
   transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
-.lux-btn:hover, .lux-btn:focus {
+.btn:hover, .btn:focus {
   background: linear-gradient(90deg, #eee 60%, #aaa 100%);
   color: #000;
   box-shadow: 0 4px 16px 0 rgba(0,0,0,0.12);
 }
 
-.lux-result {
+.result {
   margin-top: 1rem;
   background: rgba(255,255,255,0.07);
   border-radius: 12px;
@@ -116,7 +214,7 @@
   flex-direction: column;
   align-items: center;
 }
-.lux-short-url {
+.short-url {
   color: #fff;
   font-weight: 600;
   text-decoration: underline;
@@ -125,19 +223,19 @@
 }
 
 @media (max-width: 600px) {
-  .lux-container {
+  .container {
     padding: 2rem 0.7rem;
     border-radius: 18px;
     max-width: 98vw;
   }
-  .lux-title {
+  .title {
     font-size: 2rem;
   }
-  .lux-form {
+  .form {
     flex-direction: column;
     gap: 0.7rem;
   }
-  .lux-btn, .lux-input {
+  .btn, .input {
     width: 100%;
     font-size: 1em;
   }
